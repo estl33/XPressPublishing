@@ -1,24 +1,13 @@
-﻿import express from 'express';
-import sqlite from 'sqlite';
+﻿const body-parser = require('body-parser');
+const cors = require('cors');
+const errorhandler = require('errorhandler');
+const morgan = require('morgan');
+const express = require('express');
 
 const app = express();
 const port = process.env.PORT || 4000;
-const db = sqlite.open('./database.sqlite');
 
-app.get('/', function (req, res) {
-    res.send('hello world')
-})
-
-
-app.get('/post/:id', async (req, res, next) => {
-    try {
-        db.get('SELECT * FROM Post WHERE id = $id', { id: req.params.id });
-        db.all('SELECT * FROM Category')
-    } catch (err) {
-        next(err);
-    }
-});
-
+import apiRouter from './api';
 
 //** /api/artists **
 //GET   - Returns a 200 response containing all saved currently 
@@ -27,7 +16,7 @@ app.get('/post/:id', async (req, res, next) => {
 //      - created artist on the`artist` property of the response body
 //      - If any required fields are missing, returns a 400 response
 
-app.get('/api/artists', (req, res, next) => {
+apiRouter.get('/api/artists', (req, res, next) => {
     try {
         res.body.artists = db.all('SELECT * FROM Artist WHERE is_currently_employed = 1');
         res.send(200);
@@ -36,7 +25,7 @@ app.get('/api/artists', (req, res, next) => {
     }
 });
 
-app.post('/api/artists', (req, res, next) => {
+apiRouter.post('/api/artists', (req, res, next) => {
     try {
         const newArtist = req.body.artist;
         db.run('INSERT INTO Artist(id int, name text, date_of_birth text, biography text, is_currently_employed int) VALUES ($newArtist.id, $newArtist.name, $newArtist.date_of_birth, $newArtist.biography, $newArtist.is_currently_employed)',

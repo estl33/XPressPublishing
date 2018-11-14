@@ -60,7 +60,29 @@ artistRouter.post('/', (req, res, next) => {
         });
 });
 
+/*PUT*/
 
+artistRouter.put('/:artistId', (req, res, next) => {
+    if (!(req.artist.name && req.artist.dateOfBirth && req.artist.biography)) {
+        res.send(400);
+    } 
+    db.run('UPDATE Artist VALUES ($name, $dateOfBirth, $biography) WHERE id = $id',
+        {
+            $id: req.params.artistId,
+            $name: req.artist.name,
+            $dateOfBirth: req.artist.dateOfBirth,
+            $biography: req.artist.biography
+        }, (err, row) => {
+            if (err) {
+                errorhandler(err);
+            } else {
+                db.get('SELECT * FROM Artist WHERE id = $id', { $id = req.params.artistId }, (err, row) => {
+                    res.send(row);
+                    res.send(200);
+                });
+            }
+        });
+});
 
 
 

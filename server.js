@@ -8,6 +8,7 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 import apiRouter from './api';
+app.use(apiRouter, '/api');
 
 //** /api/artists **
 //GET   - Returns a 200 response containing all saved currently 
@@ -16,7 +17,7 @@ import apiRouter from './api';
 //      - created artist on the`artist` property of the response body
 //      - If any required fields are missing, returns a 400 response
 
-apiRouter.get('/api/artists', (req, res, next) => {
+apiRouter.get('/artists', (req, res, next) => {
     try {
         res.body.artists = db.all('SELECT * FROM Artist WHERE is_currently_employed = 1');
         res.send(200);
@@ -25,7 +26,7 @@ apiRouter.get('/api/artists', (req, res, next) => {
     }
 });
 
-apiRouter.post('/api/artists', (req, res, next) => {
+apiRouter.post('/artists', (req, res, next) => {
     try {
         const newArtist = req.body.artist;
         db.run('INSERT INTO Artist(id int, name text, date_of_birth text, biography text, is_currently_employed int) VALUES ($newArtist.id, $newArtist.name, $newArtist.date_of_birth, $newArtist.biography, $newArtist.is_currently_employed)',

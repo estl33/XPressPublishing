@@ -84,6 +84,26 @@ artistRouter.put('/:artistId', (req, res, next) => {
         });
 });
 
+/*DELETE*/
+
+artistRouter.delete('/:artistId', (req, res, next) => {
+    if (!(req.artist.name && req.artist.dateOfBirth && req.artist.biography)) {
+        res.send(400);
+    }
+    db.run('UPDATE Artist (is_currently_employed) VALUES (0) WHERE id = $id',
+        {
+            $id: req.params.artistId
+        }, (err, row) => {
+            if (err) {
+                errorhandler(err);
+            } else {
+                db.get('SELECT * FROM Artist WHERE id = $id', { $id = req.params.artistId }, (err, row) => {
+                    res.send(row);
+                    res.send(200);
+                });
+            }
+        });
+});
 
 
 
